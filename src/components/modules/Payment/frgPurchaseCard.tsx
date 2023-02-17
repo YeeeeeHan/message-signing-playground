@@ -19,7 +19,7 @@ import { useEffect } from 'react';
 import { useAccount, useNetwork } from 'wagmi';
 import Gpay from 'components/modules/Payment/gpay';
 
-const TokenPurchaseCard = () => {
+const FrgPurchaseCard = () => {
   return (
     <Center py={6}>
       <Box
@@ -89,11 +89,13 @@ const TokenPurchaseCard = () => {
           >
             Start your trial
           </Button> */}
-          <Gpay />
+          <Center>
+            <Gpay />
+          </Center>
         </Box>
       </Box>
     </Center>
   );
 };
 
-export default TokenPurchaseCard;
+export default FrgPurchaseCard;

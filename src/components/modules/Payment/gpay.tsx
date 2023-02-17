@@ -3,6 +3,7 @@ import GooglePayButton from '@google-pay/button-react';
 import { useAccount, useSigner, useBalance, Address, useContract } from 'wagmi';
 import { abi } from 'contract_assets/Frg.json';
 import { BigNumber } from 'ethers';
+import router from 'next/router';
 
 type Props = {
   mintFunction: () => void;
@@ -43,7 +44,8 @@ export default function Gpay() {
     const decimals = await contract?.decimals();
     const DECIMAL = BigNumber.from(10).pow(decimals);
     const mintAmount = BigNumber.from(10).mul(DECIMAL);
-    contract?.mint(userAddress, mintAmount);
+    await contract?.mint(userAddress, mintAmount);
+    router.push('/balances/erc20');
   };
 
   return (

@@ -13,12 +13,11 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useEvmWalletNFTs } from '@moralisweb3/next';
+import NftMint from 'components/modules/Payment/nftMint';
 import { useEffect } from 'react';
 import { useAccount, useNetwork } from 'wagmi';
-import Gpay from 'components/modules/Payment/gpay';
-import FrgPurchaseCard from 'components/modules/Payment/frgPurchaseCard';
 
-const FrgPurchase = () => {
+const NftPurchase = () => {
   const { chain } = useNetwork();
   const { address: userAddress } = useAccount();
   const { data: nfts } = useEvmWalletNFTs({
@@ -26,7 +25,7 @@ const FrgPurchase = () => {
     chain: chain?.id,
   });
 
-  return <FrgPurchaseCard />;
+  return <NftMint />;
 };
 
-export default FrgPurchase;
+export default NftPurchase;
