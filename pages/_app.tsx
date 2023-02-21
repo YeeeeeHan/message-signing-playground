@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ChakraProvider } from '@chakra-ui/react';
 import { configureChains } from '@wagmi/core';
 import {
@@ -74,7 +75,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
           </ChakraProvider>
         </RainbowKitWrapper>
       </Hydrate>
-      {/* <ReactQueryDevtools /> */}
+      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 };

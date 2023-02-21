@@ -21,6 +21,7 @@
     "@google-pay/button-react": "^3.0.5",
     "@moralisweb3/next": "^2.14.1",
     "@rainbow-me/rainbowkit": "^0.8.1",
+    "@tanstack/react-query-devtools": "^4.24.9",
     "@web3uikit/core": "^0.1.5",
     "@web3uikit/icons": "^0.1.5",
     "abitype": "^0.4.1",

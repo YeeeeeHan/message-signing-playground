@@ -4,19 +4,42 @@ import { abi as frgAbi } from '../../../../artifacts/contracts/erc20tokens/Frg.s
 import { BigNumber } from 'ethers';
 import { IResponseData } from '../../../../interfaces/IMint';
 import { NFTCardMint } from 'components/modules';
-import { Box, Button, Center, Link, Stack, useColorModeValue, Text, SimpleGrid } from '@chakra-ui/react';
+import { Box, Button, Center, Link, Stack, useColorModeValue, Text, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const rate = (100 * 10 ** 18).toLocaleString('fullwide', {
   useGrouping: false,
 });
 const ContractLink = `https://mumbai.polygonscan.com/address/${process.env.NEXT_PUBLIC_PET_ADDRESS}`;
-const descBgColor = useColorModeValue('gray.100', 'gray.600');
+
+interface mintNFTVariables {
+  userAddress: `0x${string}`;
+}
+interface serverResponse {
+  success: boolean;
+  data: IResponseData;
+  error?: any;
+}
+
+const mintFromServer = async ({ userAddress }: mintNFTVariables) => {
+  const body = JSON.stringify({
+    minterAddress: userAddress,
+  });
+  const ENDPOINT = '/api/v1/mint';
+  console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
+  const response: serverResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body,
+  }).then((res) => res.json());
+  return response;
+};
 
 export default function NftMint() {
+  const descBgColor = useColorModeValue('gray.100', 'gray.600');
   const { address: userAddress } = useAccount();
   const [respData, setRespData] = useState<IResponseData>();
-
   const { config, error } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_FRG_ADDRESS,
     abi: frgAbi,
@@ -30,7 +53,11 @@ export default function NftMint() {
     },
   });
 
-  // // Function to mint NFT
+  // Function to mint NFT
+  const { isLoading, mutateAsync } = useMutation(mintFromServer, {
+    onSuccess: (data) => {},
+    onError: (error) => {},
+  });
   const mintNft = async () => {
     try {
       await approveFrgSpending?.();
@@ -38,21 +65,7 @@ export default function NftMint() {
     } catch (error) {
       console.error(error);
     } finally {
-      const body = JSON.stringify({
-        minterAddress: userAddress,
-      });
-      const ENDPOINT = '/api/v1/mint';
-      console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
-      const response: {
-        success: boolean;
-        data: IResponseData;
-        error?: any;
-      } = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body,
-      }).then((res) => res.json());
-      console.log('response', response);
+      const response = await mutateAsync({ userAddress: userAddress as `0x${string}` });
       setRespData(response.data);
     }
   };
@@ -114,9 +127,13 @@ export default function NftMint() {
                   </SimpleGrid>
                 </Center>
                 <Center>
-                  <Button colorScheme="teal" size="lg" width="xs" onClick={() => mintNft()}>
-                    Mint Pet NFT
-                  </Button>
+                  {isLoading ? (
+                    <Spinner />
+                  ) : (
+                    <Button colorScheme="teal" size="lg" width="xs" onClick={() => mintNft()}>
+                      Mint Pet NFT
+                    </Button>
+                  )}
                 </Center>
                 <Link
                   href={ContractLink}
