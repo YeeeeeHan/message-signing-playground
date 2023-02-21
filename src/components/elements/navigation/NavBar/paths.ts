@@ -47,14 +47,14 @@ const NAV_LINKS: ISubNav[] = [
     href: '/purchase',
     children: [
       {
-        label: 'ERC20',
-        subLabel: 'MINT your ERC20 balances',
+        label: 'FRG',
+        subLabel: 'Purchase $FRG Tokens',
         href: '/purchase/frg',
         logo: 'token',
       },
       {
         label: 'NFT',
-        subLabel: 'MINT your ERC721 an ERC1155 balances',
+        subLabel: 'Mint NFTs with $FRG Tokens',
         href: '/purchase/nft',
         logo: 'pack',
       },

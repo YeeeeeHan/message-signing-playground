@@ -11,23 +11,14 @@ import {
   GridItem,
 } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { EvmNft } from '@moralisweb3/common-evm-utils';
-import { element } from '@rainbow-me/rainbowkit/dist/css/reset.css';
-import { Eth } from '@web3uikit/icons';
 import { FC } from 'react';
 import { resolveIPFS } from 'utils/resolveIPFS';
-import { IMetadata } from '../../../../interfaces/IMint';
-import { Header } from '../Header';
-import nft from '../../../../pages/balances/nft';
+import { IResponseData } from '../../../../interfaces/IMint';
 
 export interface NFTCardParams {
-  nft: {
-    metadata: IMetadata;
-    token_url: string;
-    token_id: string;
-  };
+  nft: IResponseData;
 }
-``;
+
 const NFTCardMint: FC<NFTCardParams> = ({ nft }) => {
   const bgColor = useColorModeValue('none', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
