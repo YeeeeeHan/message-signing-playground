@@ -40,7 +40,7 @@ export interface PetInterface extends utils.Interface {
     "rate()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "safeMint(string,address)": FunctionFragment;
-    "safeMintWithBurnFrg(string,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    "safeMintWithPermit(string,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -67,7 +67,7 @@ export interface PetInterface extends utils.Interface {
       | "rate"
       | "renounceOwnership"
       | "safeMint"
-      | "safeMintWithBurnFrg"
+      | "safeMintWithPermit"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
@@ -117,7 +117,7 @@ export interface PetInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "safeMintWithBurnFrg",
+    functionFragment: "safeMintWithPermit",
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<BigNumberish>,
@@ -205,7 +205,7 @@ export interface PetInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "safeMintWithBurnFrg",
+    functionFragment: "safeMintWithPermit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -380,7 +380,7 @@ export interface Pet extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    safeMintWithBurnFrg(
+    safeMintWithPermit(
       uri: PromiseOrValue<string>,
       deadline: PromiseOrValue<BigNumberish>,
       v: PromiseOrValue<BigNumberish>,
@@ -493,7 +493,7 @@ export interface Pet extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  safeMintWithBurnFrg(
+  safeMintWithPermit(
     uri: PromiseOrValue<string>,
     deadline: PromiseOrValue<BigNumberish>,
     v: PromiseOrValue<BigNumberish>,
@@ -604,7 +604,7 @@ export interface Pet extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    safeMintWithBurnFrg(
+    safeMintWithPermit(
       uri: PromiseOrValue<string>,
       deadline: PromiseOrValue<BigNumberish>,
       v: PromiseOrValue<BigNumberish>,
@@ -762,7 +762,7 @@ export interface Pet extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    safeMintWithBurnFrg(
+    safeMintWithPermit(
       uri: PromiseOrValue<string>,
       deadline: PromiseOrValue<BigNumberish>,
       v: PromiseOrValue<BigNumberish>,
@@ -876,7 +876,7 @@ export interface Pet extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    safeMintWithBurnFrg(
+    safeMintWithPermit(
       uri: PromiseOrValue<string>,
       deadline: PromiseOrValue<BigNumberish>,
       v: PromiseOrValue<BigNumberish>,

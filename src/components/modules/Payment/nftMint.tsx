@@ -3,8 +3,8 @@ import { Box, Button, Center, Link, SimpleGrid, Spinner, Stack, Text, useColorMo
 import { useMutation } from '@tanstack/react-query';
 import { NFTCardMint } from 'components/modules';
 import { BigNumber } from 'ethers';
-import { useState } from 'react';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useEffect, useState } from 'react';
+import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import frg from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
 import { IResponseData } from '../../../types/IMint';
 
@@ -26,17 +26,31 @@ export default function NftMint() {
   const descBgColor = useColorModeValue('gray.100', 'gray.600');
   const { address: userAddress } = useAccount();
   const [respData, setRespData] = useState<IResponseData>();
+
+  // usePrepareContractWrite
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_FRG_ADDRESS,
     abi: frg.abi,
     functionName: 'approve',
-    args: [process.env.NEXT_PUBLIC_PET_ADDRESS, BigNumber.from(rate)],
+    args: [process.env.NEXT_PUBLIC_DEPLOYER_ADDRESS, BigNumber.from(rate)],
   });
-  const { writeAsync: approveFrgSpending } = useContractWrite({
+
+  // useContractWrite
+  const { data: mintData, write: approveFrgSpending } = useContractWrite({
     ...config,
     onSuccess(data) {
       console.log('getData Success', data);
     },
+  });
+
+  // Check TX for mint function
+  const {
+    isSuccess: txSuccess,
+    isLoading: txLoading,
+    error: txError,
+  } = useWaitForTransaction({
+    confirmations: 1,
+    hash: mintData?.hash,
   });
 
   // Function to mint NFT
@@ -53,18 +67,19 @@ export default function NftMint() {
     }).then((res) => res.json());
     return response;
   };
-  const { isLoading, mutateAsync } = useMutation(mintFromServer, {});
-  const mintNft = async () => {
-    try {
-      await approveFrgSpending?.();
-      console.log('APPROVED');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      const response = await mutateAsync({ userAddress: userAddress as `0x${string}` });
+  const { isLoading, mutate } = useMutation(mintFromServer, {
+    onSuccess: (response) => {
+      console.log('MINTED', response);
       setRespData(response.data);
+    },
+  });
+
+  useEffect(() => {
+    if (txSuccess) {
+      console.log('TX SUCCESS', txSuccess);
+      mutate({ userAddress: userAddress as `0x${string}` });
     }
-  };
+  }, [txSuccess]);
 
   return (
     <Center>
@@ -117,7 +132,7 @@ export default function NftMint() {
                         1
                       </Box>
                       <Box as="h4" noOfLines={1} fontSize="sm">
-                        100 $FRG
+                        10 $FRG
                       </Box>
                     </Box>
                   </SimpleGrid>
@@ -126,7 +141,7 @@ export default function NftMint() {
                   {isLoading ? (
                     <Spinner />
                   ) : (
-                    <Button colorScheme="teal" size="lg" width="xs" onClick={() => mintNft()}>
+                    <Button colorScheme="teal" size="lg" width="xs" onClick={() => approveFrgSpending?.()}>
                       Mint Pet NFT
                     </Button>
                   )}

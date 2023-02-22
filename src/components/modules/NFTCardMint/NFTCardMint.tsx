@@ -37,7 +37,9 @@ const NFTCardMint: FC<NFTCardParams> = ({ nft }) => {
           borderColor={borderColor}
         >
           <Box maxHeight="350px" overflow={'hidden'} borderRadius="xl">
-            <Image src={resolveIPFS((nft.metadata as { image?: string })?.image)} alt={'nft'} />
+            <Center>
+              <Image src={resolveIPFS((nft.metadata as { image?: string })?.image)} alt={'nft'} />
+            </Center>
           </Box>
           <Box mt="1" fontWeight="semibold" as="h4" noOfLines={1} marginTop={2}>
             {nft.metadata.name}

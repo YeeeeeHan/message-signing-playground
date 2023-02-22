@@ -22,8 +22,6 @@ export type { IERC20 } from "./@openzeppelin/contracts/token/ERC20/IERC20";
 export { IERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
 export type { ERC721 } from "./@openzeppelin/contracts/token/ERC721/ERC721";
 export { ERC721__factory } from "./factories/@openzeppelin/contracts/token/ERC721/ERC721__factory";
-export type { ERC721Burnable } from "./@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable";
-export { ERC721Burnable__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable__factory";
 export type { ERC721Enumerable } from "./@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable";
 export { ERC721Enumerable__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable__factory";
 export type { ERC721URIStorage } from "./@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage";
