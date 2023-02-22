@@ -39,8 +39,5 @@ yarn-error.log*
 # vercel
 .vercel
 
-# hardhat and openzeppelin
-artifacts
-cache
-typechain-types
-*@openzeppelin
+# typescript
+*.tsbuildinfo
