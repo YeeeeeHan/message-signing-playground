@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import { resolveIPFS } from 'utils/resolveIPFS';
-import { IResponseData } from '../../../interfaces/IMint';
+import { IResponseData } from '../../../types/IMint';
 
 export interface NFTCardParams {
   nft: IResponseData;

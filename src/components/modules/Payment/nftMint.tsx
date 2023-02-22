@@ -6,7 +6,7 @@ import { BigNumber } from 'ethers';
 import { useState } from 'react';
 import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import frg from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
-import { IResponseData } from '../../../interfaces/IMint';
+import { IResponseData } from '../../../types/IMint';
 
 const rate = (100 * 10 ** 18).toLocaleString('fullwide', {
   useGrouping: false,
