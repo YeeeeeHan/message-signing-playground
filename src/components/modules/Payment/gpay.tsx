@@ -1,8 +1,8 @@
 import React from 'react';
 import GooglePayButton from '@google-pay/button-react';
-import { useAccount, useSigner, useBalance, Address, useContract } from 'wagmi';
+import { useAccount, useSigner, useBalance, Address, useContract, useMutation } from 'wagmi';
 import { abi } from 'contract_assets/Frg.json';
-import { BigNumber } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import router from 'next/router';
 
 type Props = {
@@ -11,26 +11,7 @@ type Props = {
 
 export default function Gpay() {
   const { address: userAddress } = useAccount();
-  const { data: signer, isError, isLoading } = useSigner();
-
-  // // Fetch frg token balance
-  // const {
-  //   data: frgData,
-  //   isError: frgError,
-  //   isLoading: frgLoading,
-  // } = useBalance({
-  //   address: userAddress,
-  //   token: process.env.NEXT_PUBLIC_FRG_ADDRESS as Address,
-  // });
-  // // Fetch USDT token balance
-  // const {
-  //   data: usdtData,
-  //   isError: usdtError,
-  //   isLoading: usdtLoading,
-  // } = useBalance({
-  //   address: userAddress,
-  //   token: process.env.NEXT_PUBLIC_USDT_ADDRESS as Address,
-  // });
+  const { data: signer } = useSigner();
 
   //Contract intractions
   const contract = useContract({
@@ -39,13 +20,32 @@ export default function Gpay() {
     signerOrProvider: signer,
   });
 
-  // Function to mint FRG
-  const mint = async () => {
+  interface mintERC20Variables {
+    contract: Contract;
+    userAddress: `0x${string}`;
+    mintAmount: number;
+  }
+
+  const mintFunction = async ({ userAddress }: mintERC20Variables) => {
     const decimals = await contract?.decimals();
     const DECIMAL = BigNumber.from(10).pow(decimals);
     const mintAmount = BigNumber.from(10).mul(DECIMAL);
     await contract?.mint(userAddress, mintAmount);
-    router.push('/balances/erc20');
+  };
+  const { isLoading, mutateAsync } = useMutation(mintFunction, {
+    onSuccess: (data) => {},
+    onError: (error) => {},
+  });
+  const mint = async () => {
+    try {
+      const decimals = await contract?.decimals();
+      const DECIMAL = BigNumber.from(10).pow(decimals);
+      const mintAmount = BigNumber.from(10).mul(DECIMAL);
+      await mutateAsync({ userAddress, mintAmount });
+      router.push('/balances/erc20');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

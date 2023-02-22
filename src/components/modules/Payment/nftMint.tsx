@@ -22,20 +22,6 @@ interface serverResponse {
   error?: any;
 }
 
-const mintFromServer = async ({ userAddress }: mintNFTVariables) => {
-  const body = JSON.stringify({
-    minterAddress: userAddress,
-  });
-  const ENDPOINT = '/api/v1/mint';
-  console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
-  const response: serverResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body,
-  }).then((res) => res.json());
-  return response;
-};
-
 export default function NftMint() {
   const descBgColor = useColorModeValue('gray.100', 'gray.600');
   const { address: userAddress } = useAccount();
@@ -54,6 +40,19 @@ export default function NftMint() {
   });
 
   // Function to mint NFT
+  const mintFromServer = async ({ userAddress }: mintNFTVariables) => {
+    const body = JSON.stringify({
+      minterAddress: userAddress,
+    });
+    const ENDPOINT = '/api/v1/mint';
+    console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
+    const response: serverResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body,
+    }).then((res) => res.json());
+    return response;
+  };
   const { isLoading, mutateAsync } = useMutation(mintFromServer, {
     onSuccess: (data) => {},
     onError: (error) => {},
