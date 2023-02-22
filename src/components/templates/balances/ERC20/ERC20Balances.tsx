@@ -53,6 +53,7 @@ const ERC20Balances = () => {
   } = useBalance({
     address: userAddress,
     token: process.env.NEXT_PUBLIC_FRG_ADDRESS as Address,
+    watch: true,
   });
 
   // Fetch USDT token balance
@@ -92,7 +93,7 @@ const ERC20Balances = () => {
         value: Number(usdtData?.formatted).toFixed(0),
       },
     ]);
-  }, []);
+  }, [frgData, usdtData]);
 
   // const tokenBalances = [
   //   {
