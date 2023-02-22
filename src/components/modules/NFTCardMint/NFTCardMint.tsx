@@ -1,19 +1,19 @@
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 import {
   Box,
   Center,
+  Grid,
+  GridItem,
   HStack,
   Image,
   Link,
   SimpleGrid,
-  Grid,
-  useColorModeValue,
   Text,
-  GridItem,
+  useColorModeValue,
 } from '@chakra-ui/react';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { FC } from 'react';
 import { resolveIPFS } from 'utils/resolveIPFS';
-import { IResponseData } from '../../../../interfaces/IMint';
+import { IResponseData } from '../../../interfaces/IMint';
 
 export interface NFTCardParams {
   nft: IResponseData;
