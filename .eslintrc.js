@@ -3,5 +3,6 @@ module.exports = {
   ignorePatterns: ['**/build/**/*'],
   rules: {
     'no-console': 'off',
+    'no-inline-comments': 'off',
   },
 };

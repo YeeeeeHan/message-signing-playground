@@ -4,13 +4,9 @@ import {
   AlertIcon,
   Box,
   Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Center,
-  Grid,
   Heading,
+  Link,
   List,
   ListIcon,
   ListItem,
@@ -19,21 +15,84 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import Gpay from 'components/modules/Payment/gpay';
 import { BigNumber } from 'ethers';
-import { abi as frgAbi } from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import frg from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
 
+interface txResult {
+  txLoading: boolean;
+  txSuccess: boolean;
+  txError: Error | null;
+  isMintStarted: boolean;
+  mintError: Error | null;
+}
+
+const renderResult = ({ txLoading, txSuccess, txError, isMintStarted, mintError }: txResult) => {
+  if (isMintStarted) {
+    <Alert status="info">
+      <AlertIcon />
+      Mint starting...
+      <br />
+      <Spinner />
+    </Alert>;
+  }
+
+  if (mintError || txError) {
+    return (
+      <Alert status="error">
+        <AlertIcon />
+        There was an error processing the mint
+      </Alert>
+    );
+  }
+  if (txLoading) {
+    return (
+      <Alert status="info">
+        <AlertIcon />
+        Minting FRG tokens...
+        <br />
+        <Spinner />
+      </Alert>
+    );
+  }
+
+  if (txSuccess) {
+    return (
+      <>
+        <Alert status="success">
+          <AlertIcon />
+          Successfully minted &nbsp;
+          <Button
+            bg={'green.400'}
+            color={'white'}
+            rounded={'xl'}
+            boxShadow={'0 5px 20px 0px rgb(72 187 120 / 43%)'}
+            _hover={{
+              bg: 'green.500',
+            }}
+            _focus={{
+              bg: 'green.500',
+            }}
+          >
+            <Link href="/balances/erc20">View Balance</Link>
+          </Button>
+        </Alert>
+      </>
+    );
+  }
+
+  return <></>;
+};
 const FrgPurchaseCard = () => {
   const { address: userAddress } = useAccount();
   const [balance, setBalance] = useState(0);
 
   // usePrepareContractWrite
-  const { config, error } = usePrepareContractWrite({
+  const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_FRG_ADDRESS,
-    abi: frgAbi,
+    abi: frg.abi,
     functionName: 'mint',
     args: [userAddress, BigNumber.from(10).mul(BigNumber.from(10).pow(18))],
   });
@@ -64,7 +123,7 @@ const FrgPurchaseCard = () => {
   // Token Balance
   const { data: userBalance } = useContractRead({
     address: process.env.NEXT_PUBLIC_FRG_ADDRESS,
-    abi: frgAbi,
+    abi: frg.abi,
     functionName: 'balanceOf',
     args: [userAddress],
     watch: true,
@@ -72,75 +131,11 @@ const FrgPurchaseCard = () => {
   useEffect(() => {
     if (userBalance) {
       console.log(userAddress);
-      let temp = (userBalance as number) / 10 ** 18;
+      const temp = (userBalance as number) / 10 ** 18;
       setBalance(temp);
     }
   }, [userBalance]);
 
-  interface txResult {
-    txLoading: Boolean;
-    txSuccess: Boolean;
-    txError: Boolean;
-    isMintStarted: Boolean;
-    mintError: Boolean;
-  }
-
-  const renderResult = ({ txLoading, txSuccess, txError, isMintStarted, mintError }: txResult) => {
-    if (isMintStarted) {
-      <Alert status="info">
-        <AlertIcon />
-        Mint starting...
-        <br />
-        <Spinner />
-      </Alert>;
-    }
-
-    if (mintError || txError) {
-      return (
-        <Alert status="error">
-          <AlertIcon />
-          There was an error processing the mint
-        </Alert>
-      );
-    }
-    if (txLoading) {
-      return (
-        <Alert status="info">
-          <AlertIcon />
-          Minting FRG tokens...
-          <br />
-          <Spinner />
-        </Alert>
-      );
-    }
-
-    if (txSuccess) {
-      return (
-        <>
-          <Alert status="success">
-            <AlertIcon />
-            Successfully minted &nbsp;
-            <Button
-              bg={'green.400'}
-              color={'white'}
-              rounded={'xl'}
-              boxShadow={'0 5px 20px 0px rgb(72 187 120 / 43%)'}
-              _hover={{
-                bg: 'green.500',
-              }}
-              _focus={{
-                bg: 'green.500',
-              }}
-            >
-              <Link href="/balances/erc20">View Balance</Link>
-            </Button>
-          </Alert>
-        </>
-      );
-    }
-
-    return <></>;
-  };
   return (
     <>
       <Heading size="lg" marginBottom={6}>
@@ -188,7 +183,7 @@ const FrgPurchaseCard = () => {
             <br />
             <br />
             <Center>
-              <Gpay mintFn={mintTokenFn!} />
+              <Gpay mintFn={mintTokenFn} />
             </Center>
             <br />
             <Text color={'gray.500'}>Current Balance: {balance} $FRG</Text>

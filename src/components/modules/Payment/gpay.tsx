@@ -1,15 +1,10 @@
-import React from 'react';
 import GooglePayButton from '@google-pay/button-react';
-import { useAccount, useSigner } from 'wagmi';
 
 interface Propsp {
-  mintFn: () => void;
+  mintFn?: () => void;
 }
 
 export default function Gpay({ mintFn }: Propsp) {
-  const { address: userAddress } = useAccount();
-  const { data: signer } = useSigner();
-
   return (
     <GooglePayButton
       environment="TEST"
@@ -44,7 +39,7 @@ export default function Gpay({ mintFn }: Propsp) {
           countryCode: 'US',
         },
       }}
-      onLoadPaymentData={(paymentRequest: google.payments.api.PaymentData) => {
+      onLoadPaymentData={() => {
         mintFn?.();
         console.log('mintToken()');
       }}

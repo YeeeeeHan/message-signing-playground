@@ -1,34 +1,29 @@
 import {
-  TableContainer,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
-  Tfoot,
-  VStack,
-  Heading,
-  Box,
-  Text,
   Avatar,
-  HStack,
-  useColorModeValue,
+  Box,
+  Button,
   Grid,
   GridItem,
-  Button,
+  Heading,
+  HStack,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useColorModeValue,
+  VStack,
 } from '@chakra-ui/react';
-// import { useEvmWalletTokenBalances } from '@moralisweb3/next';
-// import { useSession } from 'next-auth/react';
 import router from 'next/router';
 import { useEffect, useState } from 'react';
 import { getEllipsisTxt } from 'utils/format';
-import { useNetwork, useAccount, useBalance, Address } from 'wagmi';
+import { Address, useAccount, useBalance } from 'wagmi';
 
 const ERC20Balances = () => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
-  // const { data } = useSession();
-  // const { chain } = useNetwork();
   const { address: userAddress } = useAccount();
   const [tokenBalances, setTokenBalances] = useState<TokenBalances[]>([]);
 
@@ -94,24 +89,6 @@ const ERC20Balances = () => {
       },
     ]);
   }, [frgData, usdtData]);
-
-  // const tokenBalances = [
-  //   {
-  //     token: {
-  //       name: 'Wrapped Ether',
-  //       symbol: 'WETH',
-  //       decimals: 18,
-  //       logo: 'https://assets.coingecko.com/coins/images/2518/large/weth.png?1547034476',
-  //       contractAddress: {
-  //         checksum: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-  //       },
-  //     },
-  //   },
-  // ];
-
-  useEffect(() => {
-    console.log('tokenBalances: ', tokenBalances), [tokenBalances];
-  });
 
   return (
     <>

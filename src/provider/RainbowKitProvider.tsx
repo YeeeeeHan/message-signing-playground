@@ -1,26 +1,13 @@
-import React from 'react';
 import { sequenceWallet } from '@0xsequence/rainbowkit-plugin';
-import { RainbowKitProvider, getDefaultWallets, connectorsForWallets } from '@rainbow-me/rainbowkit';
-import {
-  argentWallet,
-  trustWallet,
-  ledgerWallet,
-  injectedWallet,
-  rainbowWallet,
-  walletConnectWallet,
-  metaMaskWallet,
-} from '@rainbow-me/rainbowkit/wallets';
+import { connectorsForWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { metaMaskWallet, rainbowWallet } from '@rainbow-me/rainbowkit/wallets';
+import React from 'react';
 
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { mainnet, polygon, optimism, arbitrum, goerli, polygonMumbai } from 'wagmi/chains';
+import { goerli, polygonMumbai } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
 const { chains, provider, webSocketProvider } = configureChains([polygonMumbai, goerli], [publicProvider()]);
-
-const { wallets } = getDefaultWallets({
-  appName: 'RainbowKit demo',
-  chains,
-});
 
 const connectors = connectorsForWallets([
   {
@@ -40,7 +27,7 @@ const connectors = connectorsForWallets([
             // Specify signInOptions to pick the available sign in options.
             signInOptions: ['email', 'google', 'apple'],
             theme: 'goldDark',
-            bannerUrl: `${window.location.origin}/xy3logo.png`, // Note: Does not work on localhost, but works on external server
+            bannerUrl: '/xy3logo.png',
             includedPaymentProviders: ['moonpay'],
             defaultFundingCurrency: 'matic',
             defaultPurchaseAmount: 111,

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
-import { abi as frgAbi } from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
-import { BigNumber } from 'ethers';
-import { IResponseData } from '../../../../interfaces/IMint';
-import { NFTCardMint } from 'components/modules';
-import { Box, Button, Center, Link, Stack, useColorModeValue, Text, SimpleGrid, Spinner } from '@chakra-ui/react';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { Box, Button, Center, Link, SimpleGrid, Spinner, Stack, Text, useColorModeValue } from '@chakra-ui/react';
+import { useMutation } from '@tanstack/react-query';
+import { NFTCardMint } from 'components/modules';
+import { BigNumber } from 'ethers';
+import { useState } from 'react';
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import frg from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
+import { IResponseData } from '../../../../interfaces/IMint';
 
 const rate = (100 * 10 ** 18).toLocaleString('fullwide', {
   useGrouping: false,
@@ -26,9 +26,9 @@ export default function NftMint() {
   const descBgColor = useColorModeValue('gray.100', 'gray.600');
   const { address: userAddress } = useAccount();
   const [respData, setRespData] = useState<IResponseData>();
-  const { config, error } = usePrepareContractWrite({
+  const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_FRG_ADDRESS,
-    abi: frgAbi,
+    abi: frg.abi,
     functionName: 'approve',
     args: [process.env.NEXT_PUBLIC_PET_ADDRESS, BigNumber.from(rate)],
   });
@@ -40,9 +40,9 @@ export default function NftMint() {
   });
 
   // Function to mint NFT
-  const mintFromServer = async ({ userAddress }: mintNFTVariables) => {
+  const mintFromServer = async ({ userAddress: ua }: mintNFTVariables) => {
     const body = JSON.stringify({
-      minterAddress: userAddress,
+      minterAddress: ua,
     });
     const ENDPOINT = '/api/v1/mint';
     console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
@@ -53,10 +53,7 @@ export default function NftMint() {
     }).then((res) => res.json());
     return response;
   };
-  const { isLoading, mutateAsync } = useMutation(mintFromServer, {
-    onSuccess: (data) => {},
-    onError: (error) => {},
-  });
+  const { isLoading, mutateAsync } = useMutation(mintFromServer, {});
   const mintNft = async () => {
     try {
       await approveFrgSpending?.();

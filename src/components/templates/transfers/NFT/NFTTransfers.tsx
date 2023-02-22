@@ -1,25 +1,23 @@
 import {
-  TableContainer,
+  Box,
+  Heading,
   Table,
-  Thead,
-  Tr,
-  Th,
+  TableContainer,
   Tbody,
   Td,
   Tfoot,
-  Heading,
-  Box,
+  Th,
+  Thead,
+  Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useEvmWalletNFTTransfers } from '@moralisweb3/next';
-import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { getEllipsisTxt } from 'utils/format';
 import { useAccount, useNetwork } from 'wagmi';
 
 const NFTTransfers = () => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
-  const { data } = useSession();
   const { chain } = useNetwork();
   const { address: userAddress } = useAccount();
   const { data: transfers } = useEvmWalletNFTTransfers({
