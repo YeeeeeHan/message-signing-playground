@@ -27,7 +27,7 @@ const connectors = connectorsForWallets([
             // Specify signInOptions to pick the available sign in options.
             signInOptions: ['email', 'google', 'apple'],
             theme: 'goldDark',
-            bannerUrl: '/xy3logo.png',
+            bannerUrl: '/logo.png',
             includedPaymentProviders: ['moonpay'],
             defaultFundingCurrency: 'matic',
             defaultPurchaseAmount: 111,
