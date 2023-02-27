@@ -5,6 +5,7 @@ declare global {
       NEXT_PUBLIC_PET_ADDRESS: `0x${string}`;
       NEXT_PUBLIC_DEPLOYER_ADDRESS: `0x${string}`;
       NEXT_PUBLIC_BACKEND_URL: string;
+      DEV_ALCHEMY: string;
     }
   }
 }

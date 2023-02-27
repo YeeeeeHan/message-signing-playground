@@ -30,6 +30,7 @@ import frg from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
 import pet from '../../../../artifacts/contracts/nfts/Pet.sol/Pet.json';
 import { IResponseData } from '../../../types/IMint';
 
+// tslint:disable-next-line: no-console
 // const rate = (10 * 10 ** 18).toLocaleString('fullwide', {
 //   useGrouping: false,
 // });
@@ -38,11 +39,6 @@ const ContractLink = `https://mumbai.polygonscan.com/address/${process.env.NEXT_
 interface mintNFTVariables {
   userAddress: `0x${string}`;
 }
-interface serverResponse {
-  success: boolean;
-  data: IResponseData;
-  error?: any;
-}
 
 interface txResult {
   frgApproveLoading: boolean;
@@ -50,11 +46,7 @@ interface txResult {
   frgApproveError: Error | null;
 }
 
-const renderResult = ({
-  frgApproveLoading: txLoading,
-  frgApproveSuccess: txSuccess,
-  frgApproveError: txError,
-}: txResult) => {
+const renderResult = ({ frgApproveLoading: txLoading, frgApproveSuccess: txSuccess }: txResult) => {
   if (txLoading) {
     return (
       <Alert status="info">
