@@ -106,7 +106,7 @@ const FrgPurchaseCard = () => {
   } = useContractWrite({
     ...config,
     onSuccess(data) {
-      console.log('getData Success', data);
+      console.log('useContractWrite mint nft success', data);
     },
   });
 

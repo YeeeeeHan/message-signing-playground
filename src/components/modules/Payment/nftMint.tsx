@@ -1,16 +1,38 @@
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { Box, Button, Center, Link, SimpleGrid, Spinner, Stack, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Center,
+  Link,
+  SimpleGrid,
+  Spinner,
+  Stack,
+  Text,
+  useColorModeValue,
+  useToast,
+} from '@chakra-ui/react';
 import { useMutation } from '@tanstack/react-query';
 import { NFTCardMint } from 'components/modules';
 import { BigNumber } from 'ethers';
 import { useEffect, useState } from 'react';
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import {
+  Address,
+  useAccount,
+  useBalance,
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
 import frg from '../../../../artifacts/contracts/erc20tokens/Frg.sol/Frg.json';
+import pet from '../../../../artifacts/contracts/nfts/Pet.sol/Pet.json';
 import { IResponseData } from '../../../types/IMint';
 
-const rate = (100 * 10 ** 18).toLocaleString('fullwide', {
-  useGrouping: false,
-});
+// const rate = (10 * 10 ** 18).toLocaleString('fullwide', {
+//   useGrouping: false,
+// });
 const ContractLink = `https://mumbai.polygonscan.com/address/${process.env.NEXT_PUBLIC_PET_ADDRESS}`;
 
 interface mintNFTVariables {
@@ -22,64 +44,148 @@ interface serverResponse {
   error?: any;
 }
 
+interface txResult {
+  frgApproveLoading: boolean;
+  frgApproveSuccess: boolean;
+  frgApproveError: Error | null;
+}
+
+const renderResult = ({
+  frgApproveLoading: txLoading,
+  frgApproveSuccess: txSuccess,
+  frgApproveError: txError,
+}: txResult) => {
+  if (txLoading) {
+    return (
+      <Alert status="info">
+        <AlertIcon />
+        Approving FRG spening... &nbsp;
+        <br />
+        <Spinner />
+      </Alert>
+    );
+  }
+
+  if (txSuccess) {
+    return (
+      <>
+        <Alert status="info">
+          <AlertIcon />
+          Minting NFT... &nbsp;
+          <br />
+          <Spinner />
+        </Alert>
+      </>
+    );
+  }
+
+  return <></>;
+};
+
 export default function NftMint() {
+  const toast = useToast();
   const descBgColor = useColorModeValue('gray.100', 'gray.600');
   const { address: userAddress } = useAccount();
   const [respData, setRespData] = useState<IResponseData>();
 
-  // usePrepareContractWrite
+  // Fetch frg token balance
+  const { data: frgBalance } = useBalance({
+    address: userAddress,
+    token: process.env.NEXT_PUBLIC_FRG_ADDRESS as Address,
+  });
+
+  // Get Rate from pet contract
+  const { data: rateData } = useContractRead({
+    address: process.env.NEXT_PUBLIC_PET_ADDRESS,
+    abi: pet.abi,
+    functionName: 'rate',
+  });
+  const frgCost = BigNumber.from(rateData).div(BigNumber.from(10).pow(18)).toNumber();
+
+  // Approving FRG spending contract write
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_FRG_ADDRESS,
     abi: frg.abi,
     functionName: 'approve',
-    args: [process.env.NEXT_PUBLIC_DEPLOYER_ADDRESS, BigNumber.from(rate)],
+    args: [process.env.NEXT_PUBLIC_DEPLOYER_ADDRESS, rateData],
   });
-
-  // useContractWrite
-  const { data: mintData, write: approveFrgSpending } = useContractWrite({
+  const { data: frgApproveData, write } = useContractWrite({
     ...config,
     onSuccess(data) {
-      console.log('getData Success', data);
+      console.log('useContractWrite approve FRG success', data);
     },
   });
 
-  // Check TX for mint function
+  // Check TX status for frg approve
   const {
-    isSuccess: txSuccess,
-    isLoading: txLoading,
-    error: txError,
+    isSuccess: frgApproveSuccess,
+    isLoading: frgApproveLoading,
+    error: frgApproveError,
   } = useWaitForTransaction({
     confirmations: 1,
-    hash: mintData?.hash,
+    hash: frgApproveData?.hash,
   });
 
-  // Function to mint NFT
+  // FRG balance pre-checks
+  const approveFrgSpending = async () => {
+    // rateData divided by 10 ** 18
+    if (Number(frgBalance?.formatted) < frgCost) {
+      console.log('frgBalance < rate', Number(frgBalance?.formatted) < frgCost);
+      toast({
+        title: 'Insufficient FRG balance.',
+        description: `You need at least ${frgCost} FRG to mint NFT.`,
+        status: 'error',
+        duration: null,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
+    write?.();
+  };
+
+  // Function to mint NFT from backend
   const mintFromServer = async ({ userAddress: ua }: mintNFTVariables) => {
     const body = JSON.stringify({
       minterAddress: ua,
     });
     const ENDPOINT = '/api/v1/mint';
     console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
-    const response: serverResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body,
-    }).then((res) => res.json());
-    return response;
+    });
+    const res = await response.json();
+
+    if (!response.ok) {
+      console.log('@@@@@@@@ 1 @@@@@', res);
+      throw new Error(res.error);
+    }
+    return res;
   };
-  const { isLoading, mutate } = useMutation(mintFromServer, {
-    onSuccess: (response) => {
-      console.log('MINTED', response);
-      setRespData(response.data);
+  const { isLoading: isLoadingBackendMint, mutate } = useMutation(mintFromServer, {
+    onSuccess: (data: IResponseData) => {
+      setRespData(data);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error occurred.',
+        description: error.message,
+        status: 'error',
+        duration: null,
+        isClosable: true,
+        position: 'top-right',
+      });
     },
   });
 
   useEffect(() => {
-    if (txSuccess) {
-      console.log('TX SUCCESS', txSuccess);
+    if (frgApproveSuccess) {
+      console.log('TX SUCCESS', frgApproveSuccess);
       mutate({ userAddress: userAddress as `0x${string}` });
     }
-  }, [txSuccess]);
+  }, [frgApproveSuccess]);
 
   return (
     <Center>
@@ -138,10 +244,12 @@ export default function NftMint() {
                   </SimpleGrid>
                 </Center>
                 <Center>
-                  {isLoading ? (
-                    <Spinner />
+                  {isLoadingBackendMint || frgApproveLoading ? (
+                    <Button colorScheme="teal" size="lg" width="xs" isDisabled={true}>
+                      Mint Pet NFT
+                    </Button>
                   ) : (
-                    <Button colorScheme="teal" size="lg" width="xs" onClick={() => approveFrgSpending?.()}>
+                    <Button colorScheme="teal" size="lg" width="xs" onClick={() => approveFrgSpending()}>
                       Mint Pet NFT
                     </Button>
                   )}
@@ -155,6 +263,7 @@ export default function NftMint() {
                 >
                   NFT Smart contract <ExternalLinkIcon />
                 </Link>
+                {renderResult({ frgApproveLoading, frgApproveSuccess, frgApproveError })}
               </>
             )}
           </Stack>
