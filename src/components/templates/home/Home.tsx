@@ -1,12 +1,14 @@
 import { CheckCircleIcon, SettingsIcon } from '@chakra-ui/icons';
-import { Heading, Input, List, ListIcon, ListItem, VStack } from '@chakra-ui/react';
-import Ethersjs from 'components/modules/Ethersjs/Ethersjs';
+import { Heading, List, ListIcon, ListItem, VStack } from '@chakra-ui/react';
+import EthersJs1 from 'components/modules/Ethersjs/Ethersjs1';
+import EthersJs2 from 'components/modules/Ethersjs/Ethersjs2';
 
 const Home = () => {
   return (
     <VStack w={'full'}>
-      <Input placeholder="Enter Message here" />
-      <Ethersjs />
+      <EthersJs1 />
+      <EthersJs2 />
+      {/* <Web3js /> */}
       <Heading size="md" marginBottom={6}>
         Ethereum Boilerplate
       </Heading>

@@ -13,10 +13,9 @@ import {
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
-import { useMutation } from '@tanstack/react-query';
 import { NFTCardMint } from 'components/modules';
 import { BigNumber } from 'ethers';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Address,
   useAccount,
@@ -92,7 +91,7 @@ export default function NftMint() {
     abi: pet.abi,
     functionName: 'rate',
   });
-  const frgCost = BigNumber.from(rateData).div(BigNumber.from(10).pow(18)).toNumber();
+  const frgCost = BigNumber.from(10).div(BigNumber.from(10).pow(18)).toNumber();
 
   // Approving FRG spending contract write
   const { config } = usePrepareContractWrite({
@@ -136,48 +135,48 @@ export default function NftMint() {
     write?.();
   };
 
-  // Function to mint NFT from backend
-  const mintFromServer = async ({ userAddress: ua }: mintNFTVariables) => {
-    const body = JSON.stringify({
-      minterAddress: ua,
-    });
-    const ENDPOINT = '/api/v1/mint';
-    console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body,
-    });
-    const res = await response.json();
+  // // Function to mint NFT from backend
+  // const mintFromServer = async ({ userAddress: ua }: mintNFTVariables) => {
+  //   const body = JSON.stringify({
+  //     minterAddress: ua,
+  //   });
+  //   const ENDPOINT = '/api/v1/mint';
+  //   console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet`);
+  //   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${ENDPOINT}/pet` || '', {
+  //     method: 'POST',
+  //     headers: { 'content-type': 'application/json' },
+  //     body,
+  //   });
+  //   const res = await response.json();
 
-    if (!response.ok) {
-      console.log('@@@@@@@@ 1 @@@@@', res);
-      throw new Error(res.error);
-    }
-    return res;
-  };
-  const { isLoading: isLoadingBackendMint, mutate } = useMutation(mintFromServer, {
-    onSuccess: (data: IResponseData) => {
-      setRespData(data);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error occurred.',
-        description: error.message,
-        status: 'error',
-        duration: null,
-        isClosable: true,
-        position: 'top-right',
-      });
-    },
-  });
-
-  useEffect(() => {
-    if (frgApproveSuccess) {
-      console.log('TX SUCCESS', frgApproveSuccess);
-      mutate({ userAddress: userAddress as `0x${string}` });
-    }
-  }, [frgApproveSuccess]);
+  //   if (!response.ok) {
+  //     console.log('@@@@@@@@ 1 @@@@@', res);
+  //     throw new Error(res.error);
+  //   }
+  //   return res;
+  // };
+  // const { isLoading: isLoadingBackendMint, mutate } = useMutation(mintFromServer, {
+  //   onSuccess: (data: IResponseData) => {
+  //     setRespData(data);
+  //   },
+  //   onError: (error: Error) => {
+  //     toast({
+  //       title: 'Error occurred.',
+  //       description: error.message,
+  //       status: 'error',
+  //       duration: null,
+  //       isClosable: true,
+  //       position: 'top-right',
+  //     });
+  //   },
+  // });
+  //
+  // useEffect(() => {
+  //   if (frgApproveSuccess) {
+  //     console.log('TX SUCCESS', frgApproveSuccess);
+  //     mutate({ userAddress: userAddress as `0x${string}` });
+  //   }
+  // }, [frgApproveSuccess]);
 
   return (
     <Center>

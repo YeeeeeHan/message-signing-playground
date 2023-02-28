@@ -5,7 +5,6 @@ import { metaMaskWallet, rainbowWallet } from '@rainbow-me/rainbowkit/wallets';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 
 import { useState } from 'react';
@@ -45,9 +44,9 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         <WagmiConfig client={wagmiClient}>
           <RainbowKitProvider chains={chains}>
             <ChakraProvider resetCSS theme={theme}>
-              <SessionProvider session={pageProps.session} refetchInterval={0}>
-                <Component {...pageProps} />
-              </SessionProvider>
+              {/* <SessionProvider session={pageProps.session} refetchInterval={0}> */}
+              <Component {...pageProps} />
+              {/* </SessionProvider> */}
             </ChakraProvider>
           </RainbowKitProvider>
         </WagmiConfig>
