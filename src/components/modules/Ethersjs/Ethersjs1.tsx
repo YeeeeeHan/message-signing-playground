@@ -15,13 +15,11 @@ export default function EthersJs1() {
       const stringMessage = 'hello';
       const stringSignature = await walletInst.signMessage(stringMessage);
 
-      // The Ethereum Identity function computes the KECCAK256 hash of the text bytes.
-      const bytesMessage = ethers.utils.id('0xf89804fb5037d25b0db38a99a78c487755af1fe9');
+      const bytesMessage = ethers.utils.id('hello');
       const bytesArray = ethers.utils.arrayify(bytesMessage);
       const bytesSignature = await walletInst.signMessage(bytesArray);
 
-      // Returns the KECCAK256 digest aBytesLike.
-      const keccak = ethers.utils.keccak256('0xf89804fb5037d25b0db38a99a78c487755af1fe9');
+      const keccak = ethers.utils.keccak256('0xf89804fb5037d25b0db3c48775af1fe9');
 
       console.log(stringMessage);
       console.log(bytesMessage);
