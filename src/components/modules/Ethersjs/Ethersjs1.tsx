@@ -12,48 +12,43 @@ export default function EthersJs1() {
   async function privateKey() {
     try {
       const walletInst = new ethers.Wallet(process.env.NEXT_PUBLIC_PRIVATE_KEY);
-      const message = 'hello';
-      // ===============================[1] ethers.Wallet.signMessage + utils.recoverAddress =========================================
-      const signature = await walletInst.signMessage(message);
-      console.log('[1] signature', signature);
-      const hashedMessage = hashMessage(message);
-      console.log('[1] hashedMessage', hashedMessage);
+      const stringMessage = 'hello';
+      const stringSignature = await walletInst.signMessage(stringMessage);
 
-      const signer = ethers.utils.recoverAddress(hashMessage(message), signature);
+      // The Ethereum Identity function computes the KECCAK256 hash of the text bytes.
+      const bytesMessage = ethers.utils.id('0xf89804fb5037d25b0db38a99a78c487755af1fe9');
+      const bytesArray = ethers.utils.arrayify(bytesMessage);
+      const bytesSignature = await walletInst.signMessage(bytesArray);
+
+      // Returns the KECCAK256 digest aBytesLike.
+      const keccak = ethers.utils.keccak256('0xf89804fb5037d25b0db38a99a78c487755af1fe9');
+
+      console.log(stringMessage);
+      console.log(bytesMessage);
+      console.log(keccak);
+
+      // ===============================[1] string =========================================
+      const signer = ethers.utils.recoverAddress(hashMessage(stringMessage), stringSignature);
+      // same as: const signer2 = ethers.utils.verifyMessage(stringMessage, stringSignature);
+
       console.log('[1] signer', signer);
-      console.log('\n');
-      // ===============================[2] ethers.Wallet.signMessage + utils.Arrayify + utils.verifyMessage =========================================
-      const signature2 = await walletInst.signMessage(message);
-      console.log('[2] signature2', signature2);
+      // ===============================[2]  bytes =========================================
+      const signer2 = ethers.utils.recoverAddress(hashMessage(bytesArray), bytesSignature);
+      // same as: const signer2 = ethers.utils.verifyMessage(bytesArray, bytesSignature);
 
-      const signer2 = ethers.utils.verifyMessage(message, signature2);
       console.log('[2] signer2', signer2);
-      console.log('\n');
-
-      const messageHash25 = ethers.utils.id('hello');
-      console.log('[25] messageHash', messageHash25);
-      const messageHashBytes25 = ethers.utils.arrayify(messageHash25);
-      console.log('[25] messageHashBytes', messageHashBytes25);
-      const signature25 = await walletInst.signMessage(messageHashBytes25);
-      console.log('[25] signature2', signature25);
-      const signer25 = ethers.utils.verifyMessage(messageHashBytes25, signature25);
-      console.log('[25] signer25', signer25);
-      console.log('\n');
       // ===============================[3] ethers.Wallet.signMessage + utils.splitSignature =========================================
-      const signature3 = await walletInst.signMessage(message);
-      console.log('[2] signature3', signature3);
-      const expandedSignature = ethers.utils.splitSignature(signature3);
+      const expandedSignature = ethers.utils.splitSignature(stringSignature);
 
       console.log('[3] expandedSignature', expandedSignature);
-      const signer3 = ethers.utils.recoverAddress(hashMessage(message), {
+      const signer3 = ethers.utils.recoverAddress(hashMessage(stringMessage), {
         v: expandedSignature.v,
         r: expandedSignature.r,
         s: expandedSignature.s,
       });
-      console.log('[3] signer3', signer3);
-      console.log('\n');
+      console.log('[3] signer3', signer3, '\n');
       // ===============================[4] ethereumjs-util =========================================
-      const msgHex = bufferToHex(Buffer.from(message));
+      const msgHex = bufferToHex(Buffer.from(stringMessage));
       console.log('[4] msgHex', msgHex);
       const msgBuffer = toBuffer(msgHex);
       const prefixedHashBuffer = hashPersonalMessage(msgBuffer);
